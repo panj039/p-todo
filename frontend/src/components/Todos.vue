@@ -1,8 +1,11 @@
 <template>
-	<div>
-		<li v-for="d_todo in filteredTodos" :key="d_todo.id">
-			<V_Todo :d_todo="d_todo" />
-		</li>
+	<div class="todos-container">
+		<!-- 循环渲染每个待办事项 -->
+		<ul>
+			<li v-for="d_todo in filteredTodos" :key="d_todo.id" class="todo-item">
+				<V_Todo :d_todo="d_todo" />
+			</li>
+		</ul>
 	</div>
 </template>
 
@@ -23,7 +26,7 @@ const filteredTodos = computed(() => {
 			return true;
 		} else if (props.selected_value === Selected.Completed) {
 			return d_todo.completed;
-		} else if (props.selected_value === Selected.Incomplete ) {
+		} else if (props.selected_value === Selected.Incomplete) {
 			return !d_todo.completed;
 		} else {
 			return false;
@@ -32,10 +35,31 @@ const filteredTodos = computed(() => {
 });
 
 // setInterval(() => {
-// 	console.log(props.selected_value);
-// 	console.log(props.d_todos);
-// 	console.log(filteredTodos.value);
+//  console.log(props.selected_value);
+//  console.log(props.d_todos);
+//  console.log(filteredTodos.value);
 // }, 5000);
 </script>
 
-<style scoped></style>
+<style scoped>
+.todos-container {
+	margin: 20px;
+	padding: 10px;
+	background-color: #f9f9f9;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+.todo-item {
+	padding: 10px;
+	margin-bottom: 10px;
+	background-color: #ffffff;
+	border-radius: 4px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+</style>
