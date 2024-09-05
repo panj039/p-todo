@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import { Constant } from '../defines/consts';
 import Todo from '../models/Todo';
 
 const router = Router();
@@ -6,8 +7,43 @@ const router = Router();
 // Get all todos
 router.get('/', async (req: Request, res: Response) => {
 	try {
-		const todos = await Todo.find();
-		res.json(todos);
+		const { page_no, page_size, selected_value } = req.query;
+		const pageNo = Number(page_no) || 1;
+		const pageSize = Math.min(Number(page_size) || 10, Constant.MaxPageSize);
+		const selectedValue = Number(selected_value);
+
+		// console.log(pageNo, pageSize, selectedValue);
+
+		let todos;
+		let totalCount;
+
+		const sortCondition = {
+			completed: 1,   // 未完成 (completed: false) 排前面, 已完成 (completed: true) 排后面
+			createdAt: 1    // 根据 createdAt 升序，老数据排前面
+		};
+
+		if (selectedValue == 1) {
+			// 查询 completed 为 false 的 todos 的数量，并分页
+			totalCount = await Todo.countDocuments({ completed: false });
+			todos = await Todo.paginate({ completed: false }, { page: pageNo, limit: pageSize, sort: sortCondition });
+		} else if (selectedValue == 2) {
+			// 查询 completed 为 true 的 todos 的数量，并分页
+			totalCount = await Todo.countDocuments({ completed: true });
+			todos = await Todo.paginate({ completed: true }, { page: pageNo, limit: pageSize, sort: sortCondition });
+		} else if (selectedValue == 3) {
+			// 查询所有 todos，并分页
+			totalCount = await Todo.countDocuments();
+			todos = await Todo.paginate({}, { page: pageNo, limit: pageSize, sort: sortCondition });
+		} else {
+			totalCount = 0;
+			todos = [];
+		}
+
+		// 返回结果，包括分页后的 todos 和总数
+		res.json({
+			totalCount, // 总的 todo 数量
+			todos       // 当前页面的 todos
+		});
 	} catch (err) {
 		const error = err as Error; // 将 err 断言为 Error 类型
 		res.status(500).json({ message: error.message });
