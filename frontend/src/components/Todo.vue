@@ -1,5 +1,5 @@
 <template>
-	<div class="todo-item">
+	<div :class="['todo-item', d_todo.completed ? 'completed' : 'incomplete']">
 		<!-- 根据完成情况显示不同的图标 -->
 		<label v-if="d_todo.completed" class="completed-icon">✔</label>
 		<label v-else class="incomplete-icon">✘</label>
@@ -10,8 +10,11 @@
 		<!-- 显示待办事项的创建时间 -->
 		<span class="todo-date">{{ formatDate(d_todo.createdAt) }}</span>
 
-		<!-- 如果Todo还没有ID，显示添加按钮 -->
-		<input v-if="d_todo._id === undefined" type="button" value="添加" @click="add" class="add-button">
+		<!-- 如果Todo还没有ID，显示添加和取消按钮 -->
+		<div v-if="d_todo._id === undefined">
+			<input type="button" value="添加" @click="add" class="add-button">
+			<input type="button" value="取消" @click="cancelAdd" class="cancel-button">
+		</div>
 
 		<!-- 如果Todo没有完成，显示完成按钮 -->
 		<input v-else-if="!d_todo.completed" type="button" value="完成" @click="complete" class="complete-button">
@@ -19,12 +22,17 @@
 </template>
 
 <script setup lang="ts">
+import { inject } from 'vue';
 import axios from 'axios';
 import Todo from './defines/todo.ts'
 
 const props = defineProps<{
 	d_todo: Todo
 }>()
+
+// 获取待办事项列表
+const getTodos = inject('getTodos')
+const cancelAdd = inject('cancelAdd')
 
 function add() {
 	// 检查标题是否为空
@@ -36,6 +44,7 @@ function add() {
 	// 向服务器发送请求，添加新的待办事项
 	axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/todos`, props.d_todo).then(response => {
 		props.d_todo._id = response.data._id;
+		getTodos();
 	}).catch(error => {
 		console.error(error);
 	});
@@ -61,16 +70,41 @@ function formatDate(dateString: string): string {
 	display: flex;
 	align-items: center;
 	margin-bottom: 10px;
+	padding: 15px;
+	border-radius: 8px;
+	border: 1px solid transparent;
+	/* 默认透明边框 */
 }
 
+/* 未完成的任务样式 */
+.incomplete {
+	background-color: #ffe6e6;
+	/* 浅红色背景 */
+	border-color: #ff4d4d;
+	/* 红色边框 */
+	box-shadow: 0 0 10px rgba(255, 77, 77, 0.2);
+	/* 红色阴影 */
+}
+
+/* 已完成的任务样式 */
+.completed {
+	background-color: #e6ffe6;
+	/* 浅绿色背景 */
+	border-color: #28a745;
+	/* 绿色边框 */
+	box-shadow: 0 0 10px rgba(40, 167, 69, 0.2);
+	/* 绿色阴影 */
+}
+
+/* 其他样式 */
 .completed-icon {
-	color: green;
+	color: #28a745;
 	margin-right: 10px;
 	font-size: 18px;
 }
 
 .incomplete-icon {
-	color: red;
+	color: #ff4d4d;
 	margin-right: 10px;
 	font-size: 18px;
 }
@@ -81,6 +115,8 @@ function formatDate(dateString: string): string {
 	margin-right: 10px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
+	background-color: #ffffff;
+	/* 输入框的背景颜色 */
 }
 
 .todo-date {
@@ -90,7 +126,8 @@ function formatDate(dateString: string): string {
 }
 
 .add-button,
-.complete-button {
+.complete-button,
+.cancel-button {
 	padding: 5px 10px;
 	font-size: 14px;
 	background-color: #007bff;
@@ -98,6 +135,14 @@ function formatDate(dateString: string): string {
 	border: none;
 	border-radius: 4px;
 	cursor: pointer;
+}
+
+.cancel-button {
+	background-color: #dc3545;
+}
+
+.cancel-button:hover {
+	background-color: #c82333;
 }
 
 .add-button:hover,

@@ -2,43 +2,57 @@
 	<div class="todos-container">
 		<!-- 循环渲染每个待办事项 -->
 		<ul>
-			<li v-for="d_todo in filteredTodos" :key="d_todo.id" class="todo-item">
+			<li v-for="d_todo in props.d_todos" :key="d_todo.id" class="todo-item">
 				<V_Todo :d_todo="d_todo" />
 			</li>
 		</ul>
+
+		<!-- 分页控件 -->
+		<div class="pagination">
+			<button @click="prevPage" :disabled="page.no === 1">上一页</button>
+			<span>第 {{ page.no }} 页 / 共 {{ totalPages }} 页</span>
+			<button @click="nextPage" :disabled="page.no === totalPages">下一页</button>
+		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import V_Todo from './Todo.vue'
-import Todo from '@/defines/todo.ts'
-import { Selected } from '@/defines/selected.ts'
+import { computed, inject } from 'vue';
+import V_Todo from './Todo.vue';
+import Todo from '@/defines/todo.ts';
+import Page from '@/defines/page.ts';
+import { Selected } from '@/defines/selected.ts';
 
 const props = defineProps<{
 	d_todos: Todo[],
-	selected_value: number
-}>()
+	selected_value: number,
+	page: Page
+}>();
 
-const filteredTodos = computed(() => {
-	return props.d_todos.filter(d_todo => {
-		if (props.selected_value === Selected.All) {
-			return true;
-		} else if (props.selected_value === Selected.Completed) {
-			return d_todo.completed;
-		} else if (props.selected_value === Selected.Incomplete) {
-			return !d_todo.completed;
-		} else {
-			return false;
-		}
-	});
+// 计算总页数
+const totalPages = computed(() => {
+	return Math.ceil(props.page.total / props.page.size);
 });
 
-// setInterval(() => {
-//  console.log(props.selected_value);
-//  console.log(props.d_todos);
-//  console.log(filteredTodos.value);
-// }, 5000);
+// 获取待办事项列表
+const getTodos = inject('getTodos')
+
+// 切换到上一页
+function prevPage() {
+	if (props.page.no > 1) {
+		props.page.no--;
+		getTodos();
+	}
+}
+
+// 切换到下一页
+function nextPage() {
+	if (props.page.no < totalPages.value) {
+		props.page.no++;
+		getTodos();
+	}
+}
+
 </script>
 
 <style scoped>
@@ -57,9 +71,33 @@ ul {
 
 .todo-item {
 	padding: 10px;
-	margin-bottom: 10px;
-	background-color: #ffffff;
+	margin-bottom: 1px;
 	border-radius: 4px;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 20px;
+}
+
+.pagination button {
+	padding: 5px 10px;
+	margin: 0 10px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.pagination button:disabled {
+	background-color: #ccc;
+	cursor: not-allowed;
+}
+
+.pagination span {
+	font-size: 14px;
 }
 </style>
