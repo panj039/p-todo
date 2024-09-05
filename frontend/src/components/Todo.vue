@@ -24,15 +24,15 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 import axios from 'axios';
-import Todo from './defines/todo.ts'
+import Todo from '@/defines/todo'
 
 const props = defineProps<{
 	d_todo: Todo
 }>()
 
 // 获取待办事项列表
-const getTodos = inject('getTodos')
-const cancelAdd = inject('cancelAdd')
+const getTodos = inject<() => Promise<void>>('getTodos')
+const cancelAdd = inject<() => void>('cancelAdd')
 
 function add() {
 	// 检查标题是否为空
@@ -42,9 +42,13 @@ function add() {
 	}
 
 	// 向服务器发送请求，添加新的待办事项
-	axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/todos`, props.d_todo).then(response => {
+	axios.post(`${import.meta.env.VITE_API_URL}/api/todos`, props.d_todo).then(response => {
 		props.d_todo._id = response.data._id;
-		getTodos();
+		if (getTodos) {
+			getTodos();
+		} else {
+			console.error('获取函数getTodos失败');
+		}
 	}).catch(error => {
 		console.error(error);
 	});
@@ -53,14 +57,17 @@ function add() {
 function complete() {
 	// 更新待办事项为已完成
 	props.d_todo.completed = true;
-	axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/todos/${props.d_todo._id}`, props.d_todo).catch(error => {
+	axios.put(`${import.meta.env.VITE_API_URL}/api/todos/${props.d_todo._id}`, props.d_todo).catch(error => {
 		props.d_todo.completed = false;
 		console.error(error);
 	});
 }
 
-function formatDate(dateString: string): string {
-	const date = new Date(dateString);
+function formatDate(date: Date | undefined): string {
+	if (!date) {
+		return '';
+	}
+	// const date = new Date(dateString);
 	return date.toLocaleString(); // 格式化日期为本地字符串形式
 }
 </script>

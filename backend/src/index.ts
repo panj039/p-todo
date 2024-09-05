@@ -11,7 +11,8 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/todo')
+const MONGODB_URL = process.env.MONGODB_URL || 'mongodb://localhost:27017/p-todo';
+mongoose.connect(MONGODB_URL)
 	.then(() => console.log('MongoDB connected...'))
 	.catch(err => console.error('MongoDB connection error:', err));
 
