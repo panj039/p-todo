@@ -21,11 +21,9 @@ import { computed, inject } from 'vue';
 import V_Todo from './Todo.vue';
 import Todo from '@/defines/todo';
 import Page from '@/defines/page';
-import { Selected } from '@/defines/selected';
 
 const props = defineProps<{
 	d_todos: Todo[],
-	selected_value: number,
 	page: Page
 }>();
 
@@ -35,7 +33,7 @@ const totalPages = computed(() => {
 });
 
 // 获取待办事项列表
-const getTodos = inject<() => Promise<void>>('getTodos')
+const getTodos = inject<() => Promise<void>>('getTodos');
 
 // 切换到上一页
 function prevPage() {
@@ -78,9 +76,16 @@ ul {
 }
 
 .todo-item {
-	padding: 10px;
-	margin-bottom: 1px;
+	padding: 0;
+	/* 取消padding，避免偏移 */
+	margin-bottom: 5px;
 	border-radius: 4px;
+	box-shadow: 10px 5px 10px rgba(0, 0, 0, 0.1);
+	width: 100%;
+	/* 确保待办事项占满父容器 */
+	display: flex;
+	justify-content: center;
+	/* 确保内容居中 */
 }
 
 .pagination {
