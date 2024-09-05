@@ -2,7 +2,7 @@
 	<div class="todos-container">
 		<!-- 循环渲染每个待办事项 -->
 		<ul>
-			<li v-for="d_todo in props.d_todos" :key="d_todo.id" class="todo-item">
+			<li v-for="d_todo in props.d_todos" :key="d_todo._id" class="todo-item">
 				<V_Todo :d_todo="d_todo" />
 			</li>
 		</ul>
@@ -19,9 +19,9 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
 import V_Todo from './Todo.vue';
-import Todo from '@/defines/todo.ts';
-import Page from '@/defines/page.ts';
-import { Selected } from '@/defines/selected.ts';
+import Todo from '@/defines/todo';
+import Page from '@/defines/page';
+import { Selected } from '@/defines/selected';
 
 const props = defineProps<{
 	d_todos: Todo[],
@@ -35,13 +35,13 @@ const totalPages = computed(() => {
 });
 
 // 获取待办事项列表
-const getTodos = inject('getTodos')
+const getTodos = inject<() => Promise<void>>('getTodos')
 
 // 切换到上一页
 function prevPage() {
 	if (props.page.no > 1) {
 		props.page.no--;
-		getTodos();
+		run_getTodos();
 	}
 }
 
@@ -49,7 +49,15 @@ function prevPage() {
 function nextPage() {
 	if (props.page.no < totalPages.value) {
 		props.page.no++;
+		run_getTodos();
+	}
+}
+
+function run_getTodos() {
+	if (getTodos) {
 		getTodos();
+	} else {
+		console.error('获取函数getTodos失败');
 	}
 }
 

@@ -13,11 +13,11 @@ import { computed, onMounted, ref, provide, watch } from 'vue';
 import axios from 'axios';
 import V_Header from './components/Header.vue';
 import V_Todos from './components/Todos.vue';
-import Todo from '@/defines/todo.ts';
-import Page from '@/defines/page.ts';
-import { Selected } from '@/defines/selected.ts';
+import Todo from '@/defines/todo';
+import Page from '@/defines/page';
+import { Selected } from '@/defines/selected';
 
-const d_todos = ref([]);
+const d_todos = ref<Todo[]>([]);
 const selected = ref<number[]>([Selected.Incomplete]);
 const page = ref(new Page());
 
@@ -37,7 +37,7 @@ watch(selectedValue, () => {
 
 async function getTodos() {
 	try {
-		const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/todos`, {
+		const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/todos`, {
 			params: {
 				page_no: page.value.no,
 				page_size: page.value.size,

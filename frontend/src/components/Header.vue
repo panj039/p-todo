@@ -14,8 +14,8 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import Todo from '@/defines/todo.ts';
-import { Selected } from '@/defines/selected.ts';
+import Todo from '@/defines/todo';
+import { Selected } from '@/defines/selected';
 import { useToast } from 'vue-toastification'; // 引入 Toast
 
 const props = defineProps<{

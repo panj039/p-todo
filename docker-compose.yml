@@ -1,0 +1,32 @@
+name: "p-todo"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://backend:5000
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017/p-todo
+  
+  mongodb:
+    image: bitnami/mongodb:7.0.14
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./tmp/mongodb-7.0.14:/bitnami/mongodb
