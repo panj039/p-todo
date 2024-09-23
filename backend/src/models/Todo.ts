@@ -3,6 +3,7 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 
 // 定义 ITodo 接口
 interface ITodo extends Document {
+	username: string;
 	title: string;
 	completed: boolean;
 	createdAt: Date;
@@ -10,6 +11,7 @@ interface ITodo extends Document {
 
 // 定义 todoSchema
 const todoSchema = new Schema<ITodo>({
+	username: { type: String, required: true },
 	title: { type: String, required: true },
 	completed: { type: Boolean, default: false },
 	createdAt: { type: Date, default: Date.now }

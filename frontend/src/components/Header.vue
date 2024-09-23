@@ -9,6 +9,7 @@
 		<div class="add-todo">
 			<input type="button" value="Add Todo" @click="onAdd" class="add-todo-button" />
 		</div>
+		<V_User />
 	</div>
 </template>
 
@@ -17,6 +18,7 @@ import { ref, watch } from 'vue';
 import Todo from '@/defines/todo';
 import { Selected } from '@/defines/selected';
 import { useToast } from 'vue-toastification'; // 引入 Toast
+import V_User from '@/components/User.vue'
 
 const props = defineProps<{
 	d_todos: Todo[],
@@ -55,7 +57,7 @@ function onAdd() {
 		toast.info('请先完成未完成的 Todo 任务！');
 		return;
 	}
-	props.d_todos.unshift(new Todo('', false));
+	props.d_todos.unshift(new Todo('', false, localStorage.getItem('username')));
 };
 
 </script>
