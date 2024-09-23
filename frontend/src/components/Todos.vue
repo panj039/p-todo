@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { computed, inject } from 'vue';
-import V_Todo from './Todo.vue';
+import V_Todo from '@/components/Todo.vue';
 import Todo from '@/defines/todo';
 import Page from '@/defines/page';
 

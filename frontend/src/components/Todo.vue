@@ -48,7 +48,7 @@ function add() {
 	}
 
 	// 向服务器发送请求，添加新的待办事项
-	RequestUtil.post("", props.d_todo).then(response => {
+	RequestUtil.post("/todo", props.d_todo).then(response => {
 		props.d_todo._id = response.data._id;
 		if (getTodos) {
 			getTodos();
@@ -63,7 +63,7 @@ function add() {
 function complete() {
 	// 更新待办事项为已完成
 	props.d_todo.completed = true;
-	RequestUtil.put(props.d_todo._id, props.d_todo).catch(error => {
+	RequestUtil.put(`/todo/${props.d_todo._id}`, props.d_todo).catch(error => {
 		props.d_todo.completed = false;
 		console.error(error);
 	});
@@ -71,7 +71,7 @@ function complete() {
 
 function todo_delete() {
 	// 向服务器发送请求，删除待办事项
-	RequestUtil.delete(props.d_todo._id).then(() => {
+	RequestUtil.delete(`/todo/${props.d_todo._id}`).then(() => {
 		if (getTodos) {
 			getTodos();
 		} else {
@@ -172,7 +172,8 @@ function formatDate(date: Date | undefined): string {
 }
 
 .hidden-button {
-	visibility: hidden; /* 隐藏的按钮占位符，保持布局 */
+	visibility: hidden;
+	/* 隐藏的按钮占位符，保持布局 */
 }
 
 .cancel-button,
